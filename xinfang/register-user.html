@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>警务管理系统 - 用户注册</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0066cc, #4d94ff);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .register-logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .register-logo img {
+            width: 80px;
+            height: 80px;
+        }
+        .register-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .register-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        .version {
+            text-align: center;
+            color: #ccc;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-logo">
+            <img src="images/logo.svg" alt="警务管理系统">
+        </div>
+        <h2 class="register-title">用户注册</h2>
+        
+        <form id="register-user-form">
+            <div class="form-group">
+                <label for="fullname">姓名</label>
+                <input type="text" id="fullname" class="form-control" placeholder="请输入真实姓名" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" class="form-control" placeholder="请输入用户名" required>
+                <small id="username-error" style="color: red; display: none;">用户名已存在，请选择其他用户名</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" class="form-control" placeholder="请输入密码" required>
+                <small>密码长度至少6位，包含字母和数字</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm-password">确认密码</label>
+                <input type="password" id="confirm-password" class="form-control" placeholder="请再次输入密码" required>
+                <small id="password-error" style="color: red; display: none;">两次输入的密码不一致</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="user-level">用户级别</label>
+                <select id="user-level" class="form-control" required>
+                    <option value="">请选择用户级别</option>
+                    <option value="city">市级用户</option>
+                    <option value="county">县(区)级用户</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="department">所属部门</label>
+                <input type="text" id="department" class="form-control" placeholder="请输入所属部门" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="contact">联系方式</label>
+                <input type="text" id="contact" class="form-control" placeholder="请输入手机号码" required>
+            </div>
+            
+            <button type="submit" class="btn btn-block">注册</button>
+        </form>
+        
+        <div class="login-link">
+            已有账号？<a href="index.html">返回登录</a>
+        </div>
+        
+        <div class="version">
+            系统版本: v1.0.0
+        </div>
+    </div>
+    
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const registerForm = document.getElementById('register-user-form');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            const usernameError = document.getElementById('username-error');
+            const passwordError = document.getElementById('password-error');
+            
+            // 检查用户名是否已存在
+            usernameInput.addEventListener('blur', function() {
+                const username = this.value.trim();
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                
+                const userExists = users.some(user => user.username === username);
+                if (userExists) {
+                    usernameError.style.display = 'block';
+                } else {
+                    usernameError.style.display = 'none';
+                }
+            });
+            
+            // 检查两次密码是否一致
+            confirmPasswordInput.addEventListener('input', function() {
+                if (this.value !== passwordInput.value) {
+                    passwordError.style.display = 'block';
+                } else {
+                    passwordError.style.display = 'none';
+                }
+            });
+            
+            // 表单提交处理
+            registerForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // 验证两次密码是否一致
+                if (passwordInput.value !== confirmPasswordInput.value) {
+                    passwordError.style.display = 'block';
+                    return;
+                }
+                
+                // 验证密码强度
+                const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+                if (!passwordPattern.test(passwordInput.value)) {
+                    alert('密码必须至少6位，且包含字母和数字');
+                    return;
+                }
+                
+                // 获取表单数据
+                const newUser = {
+                    id: Date.now(), // 使用时间戳作为唯一ID
+                    username: usernameInput.value.trim(),
+                    password: passwordInput.value,
+                    role: 'user',
+                    level: document.getElementById('user-level').value,
+                    name: document.getElementById('fullname').value.trim(),
+                    department: document.getElementById('department').value.trim(),
+                    contact: document.getElementById('contact').value.trim(),
+                    registerTime: new Date().toISOString()
+                };
+                
+                // 获取现有用户数据
+                let users = JSON.parse(localStorage.getItem('users') || '[]');
+                
+                // 检查用户名是否已存在
+                if (users.some(user => user.username === newUser.username)) {
+                    usernameError.style.display = 'block';
+                    return;
+                }
+                
+                // 添加新用户
+                users.push(newUser);
+                
+                // 保存到本地存储
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                // 注册成功提示
+                alert('注册成功！请返回登录页面使用新账号登录。');
+                
+                // 跳转到登录页
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html> 

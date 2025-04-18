@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>警务管理系统 - 信息登记录入</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div class="navbar">
+        <div class="container navbar-container">
+            <div class="navbar-logo">警务管理系统</div>
+            <ul class="navbar-menu">
+                <li><a href="dashboard.html">首页</a></li>
+                <li><span id="user-name">用户名</span></li>
+                <li><a href="#" id="logout-btn">退出</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- 主内容区 -->
+    <div class="container">
+        <div class="card">
+            <h3 class="card-title">信息登记录入</h3>
+            
+            <div class="form-container">
+                <h4 class="form-title">基本信息</h4>
+                
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="case-number">案件编号</label>
+                        <input type="text" id="case-number" class="form-control" placeholder="系统自动生成" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="case-title">案件标题</label>
+                        <input type="text" id="case-title" class="form-control" placeholder="请输入案件标题" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="case-type">案件类型</label>
+                        <select id="case-type" class="form-control" required>
+                            <option value="">请选择案件类型</option>
+                            <option value="criminal">刑事案件</option>
+                            <option value="administrative">行政案件</option>
+                            <option value="civil">民事纠纷</option>
+                            <option value="other">其他类型</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="case-description">案件描述</label>
+                        <textarea id="case-description" class="form-control" rows="5" placeholder="请详细描述案件情况" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reporting-person">报案人</label>
+                        <input type="text" id="reporting-person" class="form-control" placeholder="请输入报案人姓名">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-info">联系方式</label>
+                        <input type="text" id="contact-info" class="form-control" placeholder="请输入联系电话">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="incident-time">事发时间</label>
+                        <input type="datetime-local" id="incident-time" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="incident-location">事发地点</label>
+                        <input type="text" id="incident-location" class="form-control" placeholder="请输入事发地点">
+                    </div>
+                    
+                    <h4 class="form-title">附件上传</h4>
+                    
+                    <div class="form-group">
+                        <label>图片资料</label>
+                        <div class="file-upload">
+                            <input type="file" id="image-upload" accept="image/jpeg,image/jpg" multiple>
+                            <label for="image-upload" class="file-upload-label">选择图片文件 (JPG/JPEG)</label>
+                        </div>
+                        <div class="file-list" id="image-list"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>视频资料</label>
+                        <div class="file-upload">
+                            <input type="file" id="video-upload" accept="video/mp4" multiple>
+                            <label for="video-upload" class="file-upload-label">选择视频文件 (MP4)</label>
+                        </div>
+                        <div class="file-list" id="video-list"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>文档资料</label>
+                        <div class="file-upload">
+                            <input type="file" id="doc-upload" accept=".doc,.docx,.pdf,.xls,.xlsx" multiple>
+                            <label for="doc-upload" class="file-upload-label">选择文档文件 (Word/PDF/Excel)</label>
+                        </div>
+                        <div class="file-list" id="doc-list"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-notes">备注</label>
+                        <textarea id="register-notes" class="form-control" rows="3" placeholder="输入其他需要说明的情况"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-user">登记人</label>
+                        <input type="text" id="register-user" class="form-control" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-time">登记时间</label>
+                        <input type="text" id="register-time" class="form-control" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-block">提交</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加脚本 -->
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置案件编号（实际应用中应从服务器获取）
+            const caseNumber = document.getElementById('case-number');
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            caseNumber.value = `CASE-${year}${month}${day}-${random}`;
+            
+            // 设置登记人和登记时间
+            const registerUser = document.getElementById('register-user');
+            const registerTime = document.getElementById('register-time');
+            
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                const user = JSON.parse(storedUser);
+                registerUser.value = user.name;
+            }
+            
+            const formattedDate = `${year}-${month}-${day} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+            registerTime.value = formattedDate;
+            
+            // 注册表单提交事件
+            const registerForm = document.getElementById('register-form');
+            registerForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // 收集表单数据
+                const formData = {
+                    caseNumber: caseNumber.value,
+                    caseTitle: document.getElementById('case-title').value,
+                    caseType: document.getElementById('case-type').value,
+                    caseDescription: document.getElementById('case-description').value,
+                    reportingPerson: document.getElementById('reporting-person').value,
+                    contactInfo: document.getElementById('contact-info').value,
+                    incidentTime: document.getElementById('incident-time').value,
+                    incidentLocation: document.getElementById('incident-location').value,
+                    notes: document.getElementById('register-notes').value,
+                    registerUser: registerUser.value,
+                    registerTime: registerTime.value
+                };
+                
+                // 实际应用中应将数据发送到服务器
+                console.log('提交的表单数据:', formData);
+                
+                // 模拟成功提交
+                alert('案件信息登记成功！');
+                
+                // 重置表单
+                registerForm.reset();
+                
+                // 重新生成案件编号
+                const newRandom = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                caseNumber.value = `CASE-${year}${month}${day}-${newRandom}`;
+                
+                // 重置文件列表
+                document.getElementById('image-list').innerHTML = '';
+                document.getElementById('video-list').innerHTML = '';
+                document.getElementById('doc-list').innerHTML = '';
+                
+                // 重新设置登记人和登记时间
+                if (storedUser) {
+                    const user = JSON.parse(storedUser);
+                    registerUser.value = user.name;
+                }
+                
+                const newNow = new Date();
+                const newFormattedDate = `${year}-${month}-${day} ${newNow.getHours()}:${String(newNow.getMinutes()).padStart(2, '0')}`;
+                registerTime.value = newFormattedDate;
+            });
+        });
+    </script>
+</body>
+</html> 
